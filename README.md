@@ -60,11 +60,15 @@ python client.py
 ## File Structure
 
 ```Plain
-chat-app/
-├── server.py          # Backend server code
-├── client_gui.py      # GUI client code
-├── client.py          # Command-line client code
-└── README.md          # Project documentation
+SimpleChatApp/
+├── main/
+│   ├── client.py          # Command-line client code
+│   ├── client_gui.py      # GUI client code
+│   └── server.py          # Backend server code
+├── .gitignore
+├── README.md              # English documentation
+├── README.zh-CN.md        # Chinese documentation
+└── requirements.txt       # Dependencies list
 ```
 
 ## Notes

@@ -88,7 +88,6 @@ class ChatWindow(QMainWindow):
         self.setFixedSize(600, 500)  # 固定窗口大小
         self.setStyleSheet("background-color: #f5f5f5;")
 
-        # 字体设置（修复：Weight.Bold 首字母大写）
         self.font = QFont("微软雅黑", 10)
         self.bold_font = QFont("微软雅黑", 10, QFont.Weight.Bold)
 

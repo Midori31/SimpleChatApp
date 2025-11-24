@@ -60,11 +60,15 @@ python client.py
 ## 文件结构
 
 ```Plain
-chat-app/
-├── server.py          # Backend server code
-├── client_gui.py      # GUI client code
-├── client.py          # Command-line client code
-└── README.md          # Project documentation     # 项目说明文档
+SimpleChatApp/
+├── main/
+│   ├── client.py          # 命令行客户端代码
+│   ├── client_gui.py      # 图形化客户端代码
+│   └── server.py          # 后端服务器代码
+├── .gitignore             # Git 忽略文件配置
+├── README.md              # 英文说明文档
+├── README.zh-CN.md        # 中文说明文档
+└── requirements.txt       # 依赖包清单
 ```
 
 ## 注意事项
