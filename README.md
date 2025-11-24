@@ -62,7 +62,7 @@ python client.py
 ```Plain
 chat-app/
 ├── server.py          # Backend server code
-├── gui_chat_client.py # GUI client code
+├── client_gui.py      # GUI client code
 ├── client.py          # Command-line client code
 └── README.md          # Project documentation
 ```

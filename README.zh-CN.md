@@ -61,10 +61,10 @@ python client.py
 
 ```Plain
 chat-app/
-├── server.py          # 后端服务器代码
-├── gui_chat_client.py # 图形化客户端代码
-├── client.py          # 命令行客户端代码
-└── README.md          # 项目说明文档
+├── server.py          # Backend server code
+├── client_gui.py      # GUI client code
+├── client.py          # Command-line client code
+└── README.md          # Project documentation     # 项目说明文档
 ```
 
 ## 注意事项

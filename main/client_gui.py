@@ -155,7 +155,6 @@ class ChatWindow(QMainWindow):
 
     def display_message(self, msg):
         """在消息区域显示消息（区分系统通知和聊天消息）"""
-        # 修复：光标移到末尾（使用 QTextCursor.MoveOperation.End）
         self.msg_display.moveCursor(QTextCursor.MoveOperation.End)
         if msg.startswith("【系统通知】"):
             # 系统通知：蓝色加粗
@@ -167,7 +166,6 @@ class ChatWindow(QMainWindow):
             self.msg_display.setCurrentFont(self.font)
             self.msg_display.setTextColor(QColor(0, 0, 0))
             self.msg_display.insertPlainText(f"\n{msg}")
-        # 修复：自动滚动到底部
         self.msg_display.moveCursor(QTextCursor.MoveOperation.End)
 
     def update_online_list(self, login_success, online_list):
