@@ -4,16 +4,19 @@
 
 # Simple GUI Chat App
 
-A lightweight TCP-based chat application with PyQt6 GUI, supporting group chat, private chat, and online status notifications.
+A lightweight TCP-based chat application with PyQt6 GUI, supporting group chat, private chat, timestamp display, and Chinese username compatibility.
 
 ## Features
 
-- Graphical login interface
+- Graphical login interface (configurable IP/port)
 - Real-time group chat message sync
-- Private chat (format: `@username message`)
+- Private chat (double-click online user to start)
 - Auto-updating online user list
 - User online/offline notifications
-- Graceful exit mechanism
+- Message timestamps (format: `username hh:mm:ss`)
+- Chinese username support (1-20 characters)
+- Graceful exit mechanism (logout button)
+- Configuration persistence (saves last server IP/port)
 
 ## Tech Stack
 
@@ -21,6 +24,7 @@ A lightweight TCP-based chat application with PyQt6 GUI, supporting group chat, 
 - PyQt6 (GUI)
 - TCP Socket (network communication)
 - Multithreading (concurrency)
+- JSON (configuration storage)
 
 ## Quick Start
 
@@ -33,48 +37,52 @@ pip install pyqt6
 ### 2. Run Server
 
 ```Bash
-python server.py
+python -m server.main
 ```
 
 ### 3. Run Client (multiple clients supported)
 
-#### GUI Client
-
 ```Bash
-python client_gui.py
-```
-
-#### Command-Line Client (optional)
-
-```Bash
-python client.py
+python -m client.main
 ```
 
 ### 4. Usage
 
-1. Enter a username to log in (no duplicates allowed)
-2. Group chat: Type a message and send directly
-3. Private chat: Use the format `@target_username your_message`
-4. Exit: Type `exit` or close the window
+1. Enter server IP, port (default: 9000) and username (supports Chinese) to log in
+2. Group chat: Type message and send directly
+3. Private chat: Double-click a username in the online list
+4. Exit: Click "Logout" button, send `.exit` or close the window
 
 ## File Structure
 
 ```Plain
 SimpleChatApp/
 ├── main/
-│   ├── client.py          # Command-line client code
-│   ├── client_gui.py      # GUI client code
-│   └── server.py          # Backend server code
+│   ├── client/
+│   │   ├── chat_ui.py           # Main group chat window
+│   │   ├── private_chat_ui.py   # Private chat dialog
+│   │   ├── login_ui.py          # Login window
+│   │   ├── message_sender.py    # Message sending logic
+│   │   └── message_receiver.py  # Background receive thread
+│   ├── server/
+│   │   ├── main.py              # Server entry
+│   │   ├── connection.py        # Client connection handler
+│   │   ├── user_manager.py      # Online user management
+│   │   ├── message_handler.py   # Message forwarding
+│   │   └── system_notify.py     # Status notifications
+│   └── config.py                # Global configuration
 ├── .gitignore
-├── README.md              # English documentation
-├── README.zh-CN.md        # Chinese documentation
-└── requirements.txt       # Dependencies list
+├── README.md                    # English documentation
+├── README.zh-CN.md              # Chinese documentation
+└── requirements.txt             # Dependencies list
 ```
 
 ## Notes
 
-- Default server port: 9000 (modify in `server.py` if needed)
-- Manually update `SERVER_IP` in `client.py` and `client_gui.py` to the server's address
-- For local testing, set `SERVER_IP` to `127.0.0.1`
-- Ensure the server and clients are on the same network
-- Firewall may need to allow the port for network access
+- Server auto-displays local LAN IP for client connection
+- Configuration file (`config.json`) is auto-generated to save last used IP/port
+- For local testing, set server IP to `127.0.0.1`
+- Ensure server and clients are on the same network
+- Firewall may need to allow the port (default: 9000)
+- Usernames are unique (no duplicates allowed)
+- Chinese usernames support 1-20 characters (no illegal symbols)

@@ -43,7 +43,7 @@ def save_config(config):
 # 加载配置
 CONFIG = load_config()
 
-# 导出配置项（供其他文件使用）
+# 导出配置项
 SERVER_IP = CONFIG["server_ip"]
 SERVER_PORT = CONFIG["server_port"]
 BUFFER_SIZE = 1024

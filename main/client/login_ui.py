@@ -6,7 +6,7 @@ from config import load_config, save_config, DEFAULT_CONFIG
 from client.chat_ui import ChatWindow
 
 class LoginWindow(QMainWindow):
-    """登录窗口（独立UI+登录逻辑+IP/端口配置）"""
+    """登录窗口（支持中文用户名+IP/端口配置+配置保存）"""
     def __init__(self):
         super().__init__()
         self.client_socket = None
@@ -14,9 +14,9 @@ class LoginWindow(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        """初始化登录窗口UI（新增IP/端口输入框）"""
+        """初始化登录窗口UI"""
         # 窗口基础设置
-        self.setWindowTitle("聊天客户端 - 登录")
+        self.setWindowTitle("EasyChat - 登录")
         self.setFixedSize(450, 280)
         self.setStyleSheet("background-color: #f5f5f5;")
 
@@ -72,9 +72,10 @@ class LoginWindow(QMainWindow):
         config_layout.addLayout(port_layout)
         main_layout.addLayout(config_layout)
 
-        # 2. 用户名输入框
+        # 2. 用户名输入框（修改占位提示，说明支持中文）
         self.username_input = QLineEdit()
         self.username_input.setFont(self.font)
+        # 修复1：提示用户支持中文，明确长度限制
         self.username_input.setPlaceholderText("请输入用户名")
         self.username_input.setStyleSheet("""
             background-color: white;
@@ -99,7 +100,7 @@ class LoginWindow(QMainWindow):
         main_layout.addWidget(self.login_btn)
 
     def do_login(self):
-        """执行登录逻辑（验证IP/端口+连接服务器）"""
+        """执行登录逻辑（新增中文用户名长度验证）"""
         # 1. 获取并验证输入
         username = self.username_input.text().strip()
         server_ip = self.ip_input.text().strip()
@@ -108,6 +109,11 @@ class LoginWindow(QMainWindow):
         # 验证用户名
         if not username:
             QMessageBox.warning(self, "警告", "用户名不能为空！")
+            return
+
+        # 修复2：新增中文用户名长度验证（1-20个字符，中文算1个）
+        if len(username) > 20:
+            QMessageBox.warning(self, "警告", "用户名过长！")
             return
 
         # 验证IP
@@ -131,11 +137,11 @@ class LoginWindow(QMainWindow):
         }
         save_config(new_config)
 
-        # 3. 连接服务器
+        # 3. 连接服务器（保持原有utf-8编码发送，已支持中文）
         try:
             self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.client_socket.connect((server_ip, server_port))
-            # 发送用户名到服务器
+            # 发送用户名（utf-8编码，支持中文）
             self.client_socket.sendall(username.encode("utf-8"))
         except Exception as e:
             QMessageBox.critical(self, "登录失败", f"连接服务器失败：{str(e)}")

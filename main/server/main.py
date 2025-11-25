@@ -1,64 +1,61 @@
 import socket
 import threading
-import os
-from config import SERVER_BIND_ADDR
-from server.connection import handle_single_client
+from config import SERVER_BIND_ADDR, SERVER_PORT  # 适配你的配置项
 
-def get_local_ips():
-    """获取本机所有可用IP地址"""
-    ips = []
+def get_local_ip():
+    """自动获取本机局域网IP（优先返回非127.0.0.1的IP）"""
     try:
-        # 获取主机名
-        hostname = socket.gethostname()
-        # 获取所有IP地址（包括IPv4和IPv6）
-        addr_info = socket.getaddrinfo(hostname, None, socket.AF_INET, socket.SOCK_STREAM)
-        # 去重并筛选IPv4地址
-        for info in addr_info:
-            ip = info[4][0]
-            if ip not in ips and not ip.startswith("127."):  # 排除本地回环地址
-                ips.append(ip)
-        # 如果没有外部IP，添加回环地址
-        if not ips:
-            ips.append("127.0.0.1")
-    except Exception as e:
-        print(f"获取本机IP失败：{e}")
-        ips.append("127.0.0.1")
-    return ips
+        # 创建临时UDP socket，不实际连接
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))  # 连接公网服务器获取出口IP
+        local_ip = s.getsockname()[0]
+        s.close()
+        return local_ip
+    except:
+        return "127.0.0.1"  # 异常时返回本地回环IP
 
-def start_server():
-    """启动聊天服务器（监听连接、分配线程）"""
+def main():
+    """服务器主函数（适配JSON配置+自动显示IP）"""
+    local_ip = get_local_ip()
+    
     # 创建TCP socket
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # 允许端口复用（避免重启服务器时端口占用）
+    # 端口复用（避免重启时端口占用）
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    # 绑定地址和端口
+    # 绑定地址（使用 config.py 中的 SERVER_BIND_ADDR = ("0.0.0.0", 9000)）
     server_socket.bind(SERVER_BIND_ADDR)
-    # 开始监听（最大等待连接数10）
-    server_socket.listen(10)
-
-    # 获取本机IP并显示
-    local_ips = get_local_ips()
-    print("=" * 50)
-    print(f"聊天服务器启动成功！")
-    print(f"监听端口：{SERVER_BIND_ADDR[1]}")
-    print(f"本机可用IP：")
-    for ip in local_ips:
-        print(f"  - {ip}")
-    print(f"客户端连接格式：IP:{local_ips[0]}, 端口:{SERVER_BIND_ADDR[1]}")
-    print("=" * 50)
+    server_socket.listen(5)  # 最大连接数5
+    
+    # 启动成功提示（显示关键信息）
+    print("=" * 60)
+    print(f"📡 服务器已启动成功！")
+    print(f"🔌 绑定地址：{SERVER_BIND_ADDR}（监听所有网卡）")
+    print(f"🌐 本机局域网IP：{local_ip}:{SERVER_PORT}（局域网客户端连接）")
+    print(f"💻 本地测试IP：127.0.0.1:{SERVER_PORT}（本机客户端连接）")
+    print(f"⚠️  按 Ctrl+C 关闭服务器")
+    print("=" * 60)
     print("等待客户端连接...")
 
-    # 循环接收客户端连接
-    while True:
-        client_socket, client_addr = server_socket.accept()
-        print(f"\n新客户端连接：{client_addr}")
-        # 为每个客户端创建独立线程处理
-        client_thread = threading.Thread(
-            target=handle_single_client,
-            args=(client_socket, client_addr),
-            daemon=True  # 主线程退出时子线程自动退出
-        )
-        client_thread.start()
+    try:
+        while True:
+            # 接受客户端连接
+            client_socket, client_address = server_socket.accept()
+            # 为每个客户端创建独立线程
+            client_thread = threading.Thread(
+                target=handle_single_client,
+                args=(client_socket, client_address),
+                daemon=True  # 主线程退出时子线程自动退出
+            )
+            client_thread.start()
+            print(f"\n✅ 新连接：{client_address}")
+            print(f"📊 当前在线：{threading.active_count() - 1} 人")
+    except KeyboardInterrupt:
+        print("\n\n⚠️  正在关闭服务器...")
+    finally:
+        server_socket.close()
+        print("✅ 服务器已完全关闭")
 
 if __name__ == "__main__":
-    start_server()
+    # 延迟导入，避免循环依赖
+    from server.connection import handle_single_client
+    main()
