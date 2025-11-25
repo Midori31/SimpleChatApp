@@ -1,0 +1,7 @@
+# 公共配置参数（服务器和客户端共用）
+SERVER_IP = "101.76.246.151"
+SERVER_PORT = 9000
+BUFFER_SIZE = 1024
+EXIT_MARKER = "__EXIT__"
+CHAT_SEPARATOR = "|||"
+SERVER_BIND_ADDR = ("0.0.0.0", SERVER_PORT)  # 服务器绑定地址
